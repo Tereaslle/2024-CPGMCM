@@ -15,8 +15,8 @@ def read_excel_save_to_csv(file_path: str, save_name: int, sheet_name=None) -> N
     df.to_csv(save_name, index=False)
 
 
-if __name__ == '__main__':
-    read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_1_m1.csv', "材料1")
-    read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_2_m1.csv', "材料2")
-    read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_3_m1.csv', "材料3")
-    read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_4_m1.csv', "材料4")
+# if __name__ == '__main__':
+#     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_1_m1.csv', "材料1")
+#     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_1_m2.csv', "材料2")
+#     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_1_m3.csv', "材料3")
+#     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix_1_m4.csv', "材料4")

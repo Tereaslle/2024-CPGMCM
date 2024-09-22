@@ -14,10 +14,11 @@ else:
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 if __name__ == '__main__':
-    for file_name in ['appendix_1_m1.csv', 'appendix_2_m1.csv', 'appendix_3_m1.csv', 'appendix_4_m1.csv']:
+    for file_name in ['appendix1_m1.csv', 'appendix1_m2.csv', 'appendix1_m3.csv', 'appendix1_m4.csv']:
+        has = {"三角波":"2sj", "梯形波":"3tx", "正弦波":"1zx"}
         # 定义文件路径
         file_path = r"../" + file_name
-
+        folder_name = r"./imgs/" + file_name.split('_')[0] + '/' + file_name.split('_')[1][:2] + '/'
         # 读取CSV文件
         df = pd.read_csv(file_path)
         # 修改列名
@@ -44,12 +45,12 @@ if __name__ == '__main__':
                 colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']  # 自定义颜色列表，最多7种颜色
 
                 # 绘制数据
-                plt.figure(figsize=(16, 9))  # 设置图像大小
+                plt.figure(figsize=(4, 3))  # 设置图像大小
                 for i in range(signal_df.shape[0]):
                     plt.plot(x, signal_df.iloc[i], color=colors[i % len(colors)], linestyle='-')  # 使用不同的颜色
 
-                plt.xlabel('时间')  # x轴标签
-                plt.ylabel('磁通密度')  # y轴标签
-                plt.title(f"温度{temp}, {shape} 波形图")  # 图像标题
+                # plt.xlabel('时间')  # x轴标签
+                # plt.ylabel('磁通密度')  # y轴标签
+                # plt.title(f"温度{temp}, {shape} 波形图")  # 图像标题
                 plt.tight_layout()  # 自动调整子图参数
-                plt.show()
+                plt.savefig(folder_name  + str(has[shape] + '_' +  str(temp)) + '.png', dpi=300)
