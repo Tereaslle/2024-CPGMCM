@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-use_fft = True
+use_fft = False
 
 # 定义一个函数来执行FFT
 def perform_fft(row):
@@ -31,8 +31,8 @@ if __name__ == '__main__':
                        "0（磁通密度B，T）": "0"}, inplace=True)
 
     # # XGBoost需要词嵌入
-    df["励磁波形"].replace({'正弦波': 0, '三角波': 1, '梯形波': 2}, inplace=True)
-    df["励磁波形"].astype(int)
+    # df["励磁波形"].replace({'正弦波': 0, '三角波': 1, '梯形波': 2}, inplace=True)
+    # df["励磁波形"].astype(int)
     # 只读取磁通密度曲线作为特征
     features = df.iloc[:, 5:]  # 第 6 列到最后一列为磁通密度曲线
     labels = df.iloc[:, 3]  # 第四列励磁波形为标签
@@ -40,13 +40,26 @@ if __name__ == '__main__':
         features = features.to_numpy()
         features = np.abs(np.fft.fft(features))
         features = features[:, :features.shape[1] // 40]
+
+    # 计算每个样本的统计特征：均值、标准差、最大值、最小值、幅度、能量、偏度、峰度
+    features['mean'] = features.mean(axis=1)
+    features['std'] = features.std(axis=1)
+    features['max'] = features.max(axis=1)
+    features['min'] = features.min(axis=1)
+    features['amplitude'] = features['max'] - features['min']
+    features['energy'] = np.sum(np.square(features), axis=1)
+
+    # 计算偏度和峰度
+    features['skewness'] = features.apply(lambda row: skew(row), axis=1)
+    features['kurtosis'] = features.apply(lambda row: kurtosis(row), axis=1)
+
     # 划分训练集和测试集
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.3, random_state=42)
     print("------------------划分训练集完成-------------------")
     # 构建随机森林分类模型
-    # model = RandomForestClassifier()
+    model = RandomForestClassifier()
     # 构建XGBoost分类模型
-    model = XGBClassifier()
+    # model = XGBClassifier()
     # 构建贝叶斯分类器中的高斯分类器
     # model = GaussianNB()  # 垃圾
 
