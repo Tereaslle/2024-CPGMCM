@@ -5,3 +5,4 @@ __pycache__
 node_modules
 附件一（训练集）.xlsx
 appendix1_all.csv
+predicted_waveform_with_mapping.xlsx
