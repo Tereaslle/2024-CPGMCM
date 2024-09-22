@@ -4,7 +4,7 @@ import numpy as np
 
 if __name__ == '__main__':
     # 定义文件路径
-    file_path = r"../appendix_1.csv"
+    file_path = r"../appendix1_m1.csv"
 
     # pandas.read_excel('file path')读取Excel文件
     # pandas.read_csv('file path')读取csv文件
