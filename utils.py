@@ -10,6 +10,8 @@ def read_excel_save_to_csv(file_path: str, save_name: str, sheet_name=None) -> N
     :param sheet_name: excel文件中的表名
     :return: None
     """
+    if sheet_name is None:
+        sheet_name = 0
     # pandas.read_excel('file path')读取Excel文件
     # pandas.read_csv('file path')读取csv文件
     df = pd.read_excel(file_path, sheet_name=sheet_name)
@@ -52,8 +54,9 @@ def merge_appendix1_csv(file_list: List[str], save_name: str) -> None:
 
 
 if __name__ == '__main__':
-    merge_appendix1_csv(['appendix1_m1.csv', 'appendix1_m2.csv', 'appendix1_m3.csv', 'appendix1_m4.csv'],
-                        'appendix1_all.csv')
+    read_excel_save_to_csv("附件二（测试集）.xlsx", 'appendix2.csv')
+#     merge_appendix1_csv(['appendix1_m1.csv', 'appendix1_m2.csv', 'appendix1_m3.csv', 'appendix1_m4.csv'],
+#                          'appendix1_all.csv')
 #     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix1_m1.csv', "材料1")
 #     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix1_m2.csv', "材料2")
 #     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix1_m3.csv', "材料3")
