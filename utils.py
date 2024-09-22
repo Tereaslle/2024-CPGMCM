@@ -53,8 +53,9 @@ def merge_appendix1_csv(file_list: List[str], save_name: str) -> None:
     df.to_csv(save_name, index=False)
 
 
-if __name__ == '__main__':
-    read_excel_save_to_csv("附件二（测试集）.xlsx", 'appendix2.csv')
+#if __name__ == '__main__':
+#     read_excel_save_to_csv("附件三（测试集）.xlsx", 'appendix3.csv')
+#     read_excel_save_to_csv("附件二（测试集）.xlsx", 'appendix2.csv')
 #     merge_appendix1_csv(['appendix1_m1.csv', 'appendix1_m2.csv', 'appendix1_m3.csv', 'appendix1_m4.csv'],
 #                          'appendix1_all.csv')
 #     read_excel_save_to_csv("附件一（训练集）.xlsx", 'appendix1_m1.csv', "材料1")
