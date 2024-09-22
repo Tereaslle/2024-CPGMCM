@@ -1,16 +1,16 @@
 import pandas as pd
-
+import numpy as np
+import pandas as pd
+from scipy.signal import find_peaks
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
 # 定义文件路径
 file_path = r"../附件一（训练集）.xlsx"
 
 # 读取Excel文件
 data = pd.read_excel(file_path)
 # 输出数据的前几行查看
-print(data.head())
-import numpy as np
-import pandas as pd
-from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
 # 假设 `waveform_data` 是一个 numpy 数组，代表正弦波形数据
 # 同时假设我们知道每个采样点之间的时间间隔 dt（采样周期）
 i_signal=0
@@ -32,8 +32,6 @@ plt.title(title)  # 图像标题
 plt.tight_layout()  # 自动调整子图参数, 使之填充整个图像区域
 plt.show()
 
-import numpy as np
-import matplotlib.pyplot as plt
 i_signal=0
 demo_data = data.iloc[i_signal, 4:]
 # 假设提供的时序数据、频率和温度
