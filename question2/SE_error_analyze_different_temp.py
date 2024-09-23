@@ -12,6 +12,7 @@ import seaborn as sns
 from scipy.stats import pearsonr
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from utils import temp_SE,curve_fit_SE
 
 # 忽略所有的警告
 warnings.filterwarnings("ignore")
@@ -42,6 +43,12 @@ def evaluate_model(y_true, y_pred):
     r2 = r2_score(y_true, y_pred)
     return mse, rmse, mae, r2
 
+def evaluate_temp_mae(y_true, y_pred, index):
+    temp25 = mean_absolute_error(y_true[index[0]], y_pred[index[0]])
+    temp50 = mean_absolute_error(y_true[index[1]], y_pred[index[1]])
+    temp70 = mean_absolute_error(y_true[index[2]], y_pred[index[2]])
+    temp90 = mean_absolute_error(y_true[index[3]], y_pred[index[3]])
+    return temp25, temp50, temp70, temp90
 
 if __name__ == '__main__':
     # 定义文件路径
@@ -55,9 +62,9 @@ if __name__ == '__main__':
                        "0（磁通密度B，T）": "0",
                        "0（磁通密度，T）": "0"}, inplace=True)
     # 定义波形筛选条件
-    # shape_condition = df['励磁波形'] == '正弦波'
-    # data = df[shape_condition]
-    data = df
+    shape_condition = df['励磁波形'] == '正弦波'
+    data = df[shape_condition]
+    # data = df
     # 选择所有磁通密度的列名
     col = data.columns[4:]
 
@@ -82,28 +89,56 @@ if __name__ == '__main__':
     print(f"k1: {k1_ste_opt}, alpha1: {alpha1_ste_opt}, beta1: {beta1_ste_opt}")
     print("优化后的目标函数:", result.fun / 1e12)
 
-    data['斯坦麦茨方程'] = [steinmetz_eq([k1_ste_opt, alpha1_ste_opt, beta1_ste_opt], f, Bm) for f, Bm in
-                      zip(f_data, Bm_data)]
+    data['斯坦麦茨方程'] = [curve_fit_SE(f, Bm) for f, Bm in zip(f_data, Bm_data)]
+        # [steinmetz_eq([k1_ste_opt, alpha1_ste_opt, beta1_ste_opt], f, Bm) for f, Bm in zip(f_data, Bm_data)]
+    data['不同温度斯坦麦茨方程'] = [temp_SE(f, Bm, T) for f, Bm, T in
+                      zip(f_data, Bm_data, T_data)]
 
     y_true = data['磁芯损耗'].values
     y_pred_model1 = data['斯坦麦茨方程'].values
+    y_pred_model2 = data['不同温度斯坦麦茨方程'].values
 
-    fig, ax = plt.subplots(figsize=(17, 10))
-    x = range(len(y_true))
-    colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
-    for i, t in enumerate([25,50,70,90]):
-        # 筛选出不同温度的预测效果
-        temp = data[data['温度'] == t]
-        y_pred_model1_temp = temp['斯坦麦茨方程'].values
-        y_true_temp = temp['磁芯损耗'].values
-        ax.scatter(y_true_temp, y_pred_model1_temp, color=colors[i], s=8, label=f"温度{t}")
-    # ax.scatter(y_true, y_pred_model1, color='#40A0FF', s=8)
-    ax.plot(y_true, y_true,  color='red', linewidth=2)
-    plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
-    # 设置图表标题和轴标签
-    plt.title('材料一斯坦麦茨方程预测分布')
-    plt.xlabel('真实损耗')
-    plt.ylabel('预测损耗')
-    plt.savefig(f'./不同温度下斯坦麦茨方程预测分布.png', dpi=400)
+    temp_index = [data[data['温度'] == 25].index,
+                  data[data['温度'] == 50].index,
+                  data[data['温度'] == 70].index,
+                  data[data['温度'] == 90].index]
+
+    # 计算模型1和模型2的评价指标
+    metrics_model1 = evaluate_temp_mae(y_true, y_pred_model1, temp_index)
+    metrics_model2 = evaluate_temp_mae(y_true, y_pred_model2, temp_index)
+
+    # 创建DataFrame保存结果
+    df = pd.DataFrame({
+        '温度': ['25', '50', '70', '90'],
+        '斯坦麦茨方程': metrics_model1,
+        '修正后斯坦麦茨方程': metrics_model2
+    })
+
+    colors = ['#40A0FF', '#99FF33', '#7A40FF', '#FF3399']
+    # 可视化：分组直方图
+    df.set_index('温度').plot(kind='bar', figsize=(10, 6), color=colors)
+    plt.title('使用多段温度修正前后的效果对比', fontsize=12)
+    plt.ylabel('MAE误差值', fontsize=12)
+    plt.xticks(rotation=0)
+    plt.savefig(f'./使用多段温度修正前后的效果对比.png', dpi=500)
     plt.show()
+
+    # fig, ax = plt.subplots(figsize=(17, 10))
+    # x = range(len(y_true))
+    # colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
+    # for i, t in enumerate([25,50,70,90]):
+    #     # 筛选出不同温度的预测效果
+    #     temp = data[data['温度'] == t]
+    #     y_pred_model1_temp = temp['斯坦麦茨方程'].values
+    #     y_true_temp = temp['磁芯损耗'].values
+    #     ax.scatter(y_true_temp, y_pred_model1_temp, color=colors[i], s=8, label=f"温度{t}")
+    # # ax.scatter(y_true, y_pred_model1, color='#40A0FF', s=8)
+    # ax.plot(y_true, y_true,  color='red', linewidth=2)
+    # plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
+    # # 设置图表标题和轴标签
+    # plt.title('材料一斯坦麦茨方程预测分布')
+    # plt.xlabel('真实损耗')
+    # plt.ylabel('预测损耗')
+    # plt.savefig(f'./不同温度下斯坦麦茨方程预测分布.png', dpi=400)
+    # plt.show()
 
