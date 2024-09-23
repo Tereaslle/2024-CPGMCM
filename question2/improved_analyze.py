@@ -61,8 +61,9 @@ if __name__ == '__main__':
                        "0（磁通密度B，T）": "0",
                        "0（磁通密度，T）": "0"}, inplace=True)
     # 定义波形筛选条件
-    shape_condition = df['励磁波形'] == '正弦波'
-    data = df[shape_condition]
+    # shape_condition = df['励磁波形'] == '正弦波'
+    # data = df[shape_condition]
+    data = df
     # 选择所有磁通密度的列名
     col = data.columns[4:]
 
@@ -119,7 +120,6 @@ if __name__ == '__main__':
     ax.fill_between(x, y_true, max(y_true), color='white')
     # 设置图例列宽：columnspacing=float (upper left)
     plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
-    # fig.autofmt_xdate()
     plt.show()
 
 
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
     # 创建DataFrame保存结果
     df = pd.DataFrame({
-        'Metric': ['MSE', 'RMSE', 'MAE', 'R2'],
+        '误差评价指标': ['MSE', 'RMSE', 'MAE', 'R2'],
         '斯坦麦茨方程': metrics_model1,
         '调整后斯坦麦茨方程': metrics_model2
     })
@@ -137,15 +137,15 @@ if __name__ == '__main__':
     # df.to_excel('问题2\\对比结果.xlsx')
 
     df_guiyi = pd.DataFrame({
-        'Metric': ['MSE', 'RMSE', 'MAE', 'R2'],
+        '误差评价指标': ['MSE', 'RMSE', 'MAE', 'R2'],
         '斯坦麦茨方程': [i / (10 ** len(str(int(i)))) for i in metrics_model1],
         '调整后斯坦麦茨方程': [i / (10 ** len(str(int(i)))) for i in metrics_model2]
     })
     # 可视化：分组直方图
-    df_guiyi.set_index('Metric').plot(kind='bar', figsize=(10, 6))
-    plt.title('调整前后的效果对比（映射到0-1）', fontsize=20)
-    plt.ylabel('Score', fontsize=20)
+    df_guiyi.set_index('误差评价指标').plot(kind='bar', figsize=(10, 6))
+    plt.title('修正前后的效果对比（映射到0-1）', fontsize=12)
+    plt.ylabel('误差值', fontsize=12)
     plt.xticks(rotation=0)
-    plt.savefig(f'./调整前后的效果对比（映射到0-1）.png', dpi=500)
+    plt.savefig(f'./修正前后的效果对比（映射到0-1）.png', dpi=500)
     plt.show()
 
