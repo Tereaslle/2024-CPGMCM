@@ -38,7 +38,7 @@ def SE_improved_func(x,gamma,eta,k,delta_alpha,alpha,delta_beta,beta):
     :return:
     """
     f, B_m, T = x
-    k = k + np.exp(-T*gamma+eta)
+    k = k + -np.log(-T*gamma+eta)
     alpha = alpha + delta_alpha * T
     beta = beta + delta_beta * T
     return k * np.power(f, alpha) * np.power(B_m, beta)
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # 实验变量参数
     material_type = 0   # 选择材料 i + 1
     temperature = None  # None 表示不选择温度条件
-    data_path_list = [r"../appendix1_m1.csv",r"../appendix1_m2.csv",r"../appendix1_m3.csv",r"../appendix1_m4.csv"]
+    data_path_list = [r"../appendix1_m1.csv", r"../appendix1_m2.csv", r"../appendix1_m3.csv", r"../appendix1_m4.csv"]
 
     # 定义文件路径,注意需要区分材料
     file_path = data_path_list[material_type]
@@ -84,7 +84,8 @@ if __name__ == '__main__':
     param_bounds = ([-np.inf, 1, 2], [np.inf, 3, 3])
     params, covariance = curve_fit(SE_func, X, P, p0=[1, 1, 2], bounds=param_bounds)
     print(params)
+    print(covariance)
     # 计算拟合的平均绝对误差
-    filtered_df['预测磁芯损耗'] = SE_func(x=filtered_df[['频率', 'Bm']].to_numpy(), *params)
-    print(filtered_df.head())
+    # filtered_df['预测磁芯损耗'] = SE_func(x=filtered_df[['频率', 'Bm']].to_numpy(), *params)
+    # print(filtered_df.head())
 
