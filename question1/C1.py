@@ -38,7 +38,7 @@ if __name__ == '__main__':
     temp_condition = df['温度'] == 25
     # 定义波形筛选条件
     shape_condition = df['励磁波形'] == signal_shape[0]
-    filtered_df = df[(temp_condition) & (shape_condition)]
+    filtered_df = df[temp_condition & shape_condition]
     # 从第五列开始才是磁通密度的波形
     signal_df = df.iloc[[0,49,99,149,199], 4:df.shape[1]]
     x = [list(range(signal_df.shape[1])) for _ in range(signal_df.shape[0])]  # 生成一个和signal_df列数相同的索引列表
