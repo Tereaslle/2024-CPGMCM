@@ -54,11 +54,12 @@ if __name__ == '__main__':
             ax.set_xlabel('时间')
             if idx == 0:
                 ax.set_ylabel('磁通密度')
-            ax.set_title(f"{shape} 波形图预测")
+            ax.set_title(f"{shape}")
 
-        plt.tight_layout()  # 自动调整布局
+        # 设置总标题
+        fig.suptitle("附件2波形分类结果时序图", fontsize=16)
+
+        plt.tight_layout(rect=[0, 0, 1, 0.96])  # 自动调整布局，留出总标题的位置
         combined_image_path = folder_name + 'combined_waveforms.png'
         plt.savefig(combined_image_path, dpi=300)  # 保存为高分辨率图像
         plt.show()
-
-
