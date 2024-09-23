@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-use_fft = True
+use_fft = False
 
 if __name__ == '__main__':
     # 定义文件路径
@@ -33,17 +33,17 @@ if __name__ == '__main__':
         features = np.abs(np.fft.fft(features))
         features = features[:, :features.shape[1] // 40]
 
-    # # 计算每个样本的统计特征：均值、标准差、最大值、最小值、幅度、能量、偏度、峰度
-    # features['mean'] = features.mean(axis=1)
-    # features['std'] = features.std(axis=1)
-    # features['max'] = features.max(axis=1)
-    # features['min'] = features.min(axis=1)
-    # features['amplitude'] = features['max'] - features['min']
-    # features['energy'] = np.sum(np.square(features), axis=1)
-    #
-    # # 计算偏度和峰度
-    # features['skewness'] = features.apply(lambda row: skew(row), axis=1)
-    # features['kurtosis'] = features.apply(lambda row: kurtosis(row), axis=1)
+    # 计算每个样本的统计特征：均值、标准差、最大值、最小值、幅度、能量、偏度、峰度
+    features['mean'] = features.mean(axis=1)
+    features['std'] = features.std(axis=1)
+    features['max'] = features.max(axis=1)
+    features['min'] = features.min(axis=1)
+    features['amplitude'] = features['max'] - features['min']
+    features['energy'] = np.sum(np.square(features), axis=1)
+
+    # 计算偏度和峰度
+    features['skewness'] = features.apply(lambda row: skew(row), axis=1)
+    features['kurtosis'] = features.apply(lambda row: kurtosis(row), axis=1)
 
     # 划分训练集和测试集
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.3, random_state=42)
