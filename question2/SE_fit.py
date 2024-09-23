@@ -1,13 +1,10 @@
 """
-    斯坦麦茨方程k alpha beta 系数拟合
+    斯坦麦茨方程 k alpha beta 系数最小二乘拟合
 """
 
 import pandas as pd
 import numpy as np
-import pandas as pd
 from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
@@ -22,25 +19,6 @@ def SE_func(x, k, alpha, beta):
     :return:
     """
     f, B_m = x
-    return k * np.power(f, alpha) * np.power(B_m, beta)
-
-def SE_improved_func(x,gamma,eta,k,delta_alpha,alpha,delta_beta,beta):
-    """
-    引入温度因素的斯坦麦茨方程
-    :param x: 变量 [频率，磁通密度峰值，温度]
-    :param gamma: 温度修正参数
-    :param eta: 温度修正参数
-    :param k: 原参数
-    :param delta_alpha: 温度修正参数
-    :param alpha: 原参数
-    :param delta_beta: 温度修正参数
-    :param beta: 原参数
-    :return:
-    """
-    f, B_m, T = x
-    k = k + -np.log(-T*gamma+eta)
-    alpha = alpha + delta_alpha * T
-    beta = beta + delta_beta * T
     return k * np.power(f, alpha) * np.power(B_m, beta)
 
 if __name__ == '__main__':
@@ -73,8 +51,13 @@ if __name__ == '__main__':
         filtered_df = df[temp_condition & shape_condition]
     else:
         filtered_df = df[shape_condition]
+
+    # 获取所有磁通密度
+    # 获取所有磁通密度 所有列号
+    B_col = filtered_df.columns[4:]
+
     # 算出磁通密度最大值
-    filtered_df['Bm'] = filtered_df.iloc[:, 4:].max(axis=1)
+    filtered_df['Bm'] = filtered_df[B_col].max(axis=1)
     # 筛选出方程 x ，与 P
     X = filtered_df[['频率', 'Bm']].to_numpy().T
     P = filtered_df['磁芯损耗'].to_numpy()
@@ -83,8 +66,8 @@ if __name__ == '__main__':
     # 设定k, alpha和beta的下界和上界,防止运算溢出。其中k为负无穷到正无穷，alpha为1到3, beta为2到3
     param_bounds = ([-np.inf, 1, 2], [np.inf, 3, 3])
     params, covariance = curve_fit(SE_func, X, P, p0=[1, 1, 2], bounds=param_bounds)
-    print(params)
-    print(covariance)
+    print(f"拟合参数结果: {params}")
+    print(f"协方差矩阵: \n{covariance}")
     # 计算拟合的平均绝对误差
     # filtered_df['预测磁芯损耗'] = SE_func(x=filtered_df[['频率', 'Bm']].to_numpy(), *params)
     # print(filtered_df.head())
