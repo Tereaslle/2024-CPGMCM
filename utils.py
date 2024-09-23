@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import List
+import numpy as np
 
 
 def read_excel_save_to_csv(file_path: str, save_name: str, sheet_name=None) -> None:
@@ -52,8 +53,21 @@ def merge_appendix1_csv(file_list: List[str], save_name: str) -> None:
     # print(nan_rows)
     df.to_csv(save_name, index=False)
 
+def curve_fit_SE(f, Bm):
+    k_1 = 1.49974538
+    alpha_1 = 1.4296344
+    beta_1 = 2.47125407
+    return k_1 * np.power(f, alpha_1) * np.power(Bm, beta_1)
 
-#if __name__ == '__main__':
+def temp_SE(f, Bm, T):
+    dict = {25: 0, 50: 1, 70: 2, 90: 3}
+    i = dict[T]
+    k_1 = [3.99479398, 0.74065738, 0.23393301, 0.22204269]
+    alpha_1 = [1.34718585, 1.49181571, 1.59104354, 1.60157565]
+    beta_1 = [2.30477083, 2.48215826, 2.57619652, 2.65488024]
+    return k_1[i] * np.power(f, alpha_1[i]) * np.power(Bm, beta_1[i])
+
+# if __name__ == '__main__':
 #     read_excel_save_to_csv("附件三（测试集）.xlsx", 'appendix3.csv')
 #     read_excel_save_to_csv("附件二（测试集）.xlsx", 'appendix2.csv')
 #     merge_appendix1_csv(['appendix1_m1.csv', 'appendix1_m2.csv', 'appendix1_m3.csv', 'appendix1_m4.csv'],
