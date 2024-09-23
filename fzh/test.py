@@ -22,7 +22,7 @@ def SE_func(x, k, alpha, beta):
 if __name__ == '__main__':
     # 实验变量参数
 
-    material_type = 3  # 选择材料 i + 1
+    material_type = 0  # 选择材料 i + 1
     temperature = None  # None 表示不选择温度条件
     data_path_list = [r"../appendix1_m1.csv", r"../appendix1_m2.csv", r"../appendix1_m3.csv", r"../appendix1_m4.csv"]
 
