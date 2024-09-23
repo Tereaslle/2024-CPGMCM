@@ -111,7 +111,33 @@ if __name__ == '__main__':
     y_pred_model1 = data['斯坦麦茨方程'].values
     y_pred_model2 = data['调整后斯坦麦茨方程'].values
 
-    fig, ax = plt.subplots(figsize=(19, 10))
+    # 筛选出不同温度的预测效果
+    temp = data[data['温度'] == 25]
+    y_pred_model1_temp25 = temp['斯坦麦茨方程'].values
+    temp = data[data['温度'] == 50]
+    y_pred_model1_temp50 = temp['斯坦麦茨方程'].values
+    temp = data[data['温度'] == 70]
+    y_pred_model1_temp70 = temp['斯坦麦茨方程'].values
+    temp = data[data['温度'] == 90]
+    y_pred_model1_temp90 = temp['斯坦麦茨方程'].values
+
+    fig, ax = plt.subplots(figsize=(17, 10))
+    x = range(len(y_true))
+    ax.scatter(y_true, y_pred_model1, color='#40A0FF', s=8)
+    ax.plot(y_true, y_true,  color='red', linewidth=2)
+    # Erase 上面 the data by filling with white
+    # ax.fill_between(x, y_true, max(y_true), color='white')
+    # 设置图例列宽：columnspacing=float (upper left)
+    plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
+    # 设置图表标题和轴标签
+    plt.title('材料一斯坦麦茨方程预测分布')
+    plt.xlabel('真实损耗')
+    plt.ylabel('预测损耗')
+    plt.savefig(f'./斯坦麦茨方程预测分布.png', dpi=400)
+    plt.show()
+
+
+    fig, ax = plt.subplots(figsize=(10, 7))
     x = range(len(y_true))
     ax.scatter(x, y_true, color='#FF6347', s=8, label='真实磁芯损耗')
     ax.scatter(x, y_pred_model1, color='#40A0FF', s=8, label='原斯坦麦茨方程预测')
