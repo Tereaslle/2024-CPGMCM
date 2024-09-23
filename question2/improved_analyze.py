@@ -89,7 +89,7 @@ if __name__ == '__main__':
     print("优化后的目标函数:", result.fun / 1e12)
 
     # 初始猜测的参数值
-    initial_guess = [1.08, 1.4, 2.1,0]
+    initial_guess = [1.08, 1.4, 2.1, 0]
 
     # 约束条件
     bounds = [(0, None), (1, 3), (2, 3),(None,None)]  # k1 > 0, 1 < alpha1 < 3, 2 < beta1 < 3
@@ -111,22 +111,10 @@ if __name__ == '__main__':
     y_pred_model1 = data['斯坦麦茨方程'].values
     y_pred_model2 = data['调整后斯坦麦茨方程'].values
 
-    # 筛选出不同温度的预测效果
-    temp = data[data['温度'] == 25]
-    y_pred_model1_temp25 = temp['斯坦麦茨方程'].values
-    temp = data[data['温度'] == 50]
-    y_pred_model1_temp50 = temp['斯坦麦茨方程'].values
-    temp = data[data['温度'] == 70]
-    y_pred_model1_temp70 = temp['斯坦麦茨方程'].values
-    temp = data[data['温度'] == 90]
-    y_pred_model1_temp90 = temp['斯坦麦茨方程'].values
-
     fig, ax = plt.subplots(figsize=(17, 10))
     x = range(len(y_true))
     ax.scatter(y_true, y_pred_model1, color='#40A0FF', s=8)
     ax.plot(y_true, y_true,  color='red', linewidth=2)
-    # Erase 上面 the data by filling with white
-    # ax.fill_between(x, y_true, max(y_true), color='white')
     # 设置图例列宽：columnspacing=float (upper left)
     plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
     # 设置图表标题和轴标签
