@@ -7,7 +7,7 @@ import numpy as np
 from scipy.optimize import minimize,curve_fit
 
 
-def SE_improved_func(x, delta_k, gamma, eta, k, delta_alpha, alpha, delta_beta, beta):
+def SE_improved_func(x, delta_k, gamma, eta, k, alpha, beta):
     """
     引入温度因素的斯坦麦茨方程
     :param x: 变量 [频率，磁通密度峰值，温度]
@@ -23,8 +23,6 @@ def SE_improved_func(x, delta_k, gamma, eta, k, delta_alpha, alpha, delta_beta, 
     """
     f, B_m, T = x
     k = k + -delta_k * np.log(T * gamma + eta)
-    alpha = alpha + delta_alpha * T
-    beta = beta + delta_beta * T
     return k * np.power(f, alpha) * np.power(B_m, beta)
 
 
@@ -78,14 +76,13 @@ if __name__ == '__main__':
     X = filtered_df[['频率','Bm','温度']].to_numpy().T
     P_data = filtered_df['磁芯损耗'].values
 
-    # 初始猜测的参数值  delta_k, gamma, eta, k, delta_alpha, alpha, delta_beta, beta
-    initial_guess = [5, 0.05, 5, 5,
-                     0.03, 5, 0.03, 5]
+    # 初始猜测的参数值  delta_k, gamma, eta, k, alpha, beta
+    initial_guess = [5, 10, 5, 5, 2, 2.5]
 
     # 优化约束条件  delta_k > 0 0<gamma<0.1 eta 无约束 k 无约束
     #    0<delta_alpha<0.5  alpha无约束   0<delta_beta<0.5 beta无约束
-    bounds = [(0, None), (0, 0.1), (None, None), (None, None),
-              (0, 0.15), (-5, 5), (0, 0.15), (-5, 5)]
+    bounds = [(0, None), (None, None), (None, None), (None, None),
+              (1, 3), (2, 3)]
     # 最小二乘的约束条件
     param_bounds = [[i if i is not None else -np.inf for i,_ in bounds],
                     [i if i is not None else np.inf for _,i in bounds]]
