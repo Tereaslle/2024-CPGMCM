@@ -57,7 +57,7 @@ if __name__ == '__main__':
             ax.set_title(f"{shape}")
 
         # 设置总标题
-        fig.suptitle("附件2波形分类结果时序图", fontsize=16)
+        fig.suptitle("附件二波形分类结果时序图", fontsize=16)
 
         plt.tight_layout(rect=[0, 0, 1, 0.96])  # 自动调整布局，留出总标题的位置
         combined_image_path = folder_name + 'combined_waveforms.png'
