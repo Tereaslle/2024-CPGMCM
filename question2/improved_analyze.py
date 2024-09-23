@@ -111,15 +111,20 @@ if __name__ == '__main__':
     y_pred_model1 = data['斯坦麦茨方程'].values
     y_pred_model2 = data['调整后斯坦麦茨方程'].values
 
-    fig, ax = plt.subplots(figsize=(21, 9))
+    fig, ax = plt.subplots(figsize=(19, 10))
     x = range(len(y_true))
-    ax.plot(x, y_true, 'r-', label='真实磁芯损耗', linewidth=1)
-    ax.plot(x, y_pred_model1, 'b-', label='原斯坦麦茨方程预测', linewidth=2)
-    ax.plot(x, y_pred_model2, 'g-', label='修正斯坦麦茨方程预测', linewidth=2)
+    ax.scatter(x, y_true, color='#FF6347', s=8, label='真实磁芯损耗')
+    ax.scatter(x, y_pred_model1, color='#40A0FF', s=8, label='原斯坦麦茨方程预测')
+    ax.scatter(x, y_pred_model2, color='#66CDAA', s=8, label='修正斯坦麦茨方程预测')
     # Erase 上面 the data by filling with white
-    ax.fill_between(x, y_true, max(y_true), color='white')
+    # ax.fill_between(x, y_true, max(y_true), color='white')
     # 设置图例列宽：columnspacing=float (upper left)
     plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
+    # 设置图表标题和轴标签
+    plt.title('磁芯损耗预测对比')
+    plt.xlabel('样本索引')
+    plt.ylabel('磁芯损耗')
+    plt.savefig(f'./修正前后的效果对比散点图.png', dpi=400)
     plt.show()
 
 
@@ -135,14 +140,14 @@ if __name__ == '__main__':
     })
 
     # df.to_excel('问题2\\对比结果.xlsx')
-
+    colors = ['#FF6347','#66CDAA']
     df_guiyi = pd.DataFrame({
         '误差评价指标': ['MSE', 'RMSE', 'MAE', 'R2'],
         '斯坦麦茨方程': [i / (10 ** len(str(int(i)))) for i in metrics_model1],
         '调整后斯坦麦茨方程': [i / (10 ** len(str(int(i)))) for i in metrics_model2]
     })
     # 可视化：分组直方图
-    df_guiyi.set_index('误差评价指标').plot(kind='bar', figsize=(10, 6))
+    df_guiyi.set_index('误差评价指标').plot(kind='bar', figsize=(10, 6), color=colors)
     plt.title('修正前后的效果对比（映射到0-1）', fontsize=12)
     plt.ylabel('误差值', fontsize=12)
     plt.xticks(rotation=0)
