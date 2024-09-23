@@ -22,7 +22,7 @@ def SE_improved_func(x, delta_k, gamma, eta, k, delta_alpha, alpha, delta_beta, 
     :return:
     """
     f, B_m, T = x
-    k = k + -delta_k * np.log(-T * gamma + eta)
+    k = k + -delta_k * np.log(T * gamma + eta)
     alpha = alpha + delta_alpha * T
     beta = beta + delta_beta * T
     return k * np.power(f, alpha) * np.power(B_m, beta)
@@ -85,12 +85,10 @@ if __name__ == '__main__':
     # 优化约束条件  delta_k > 0 0<gamma<0.1 eta 无约束 k 无约束
     #    0<delta_alpha<0.5  alpha无约束   0<delta_beta<0.5 beta无约束
     bounds = [(0, None), (0, 0.1), (None, None), (None, None),
-              (0, 0.5), (None, None), (0, 0.5), (None, None)]
+              (0, 0.15), (-5, 5), (0, 0.15), (-5, 5)]
     # 最小二乘的约束条件
-    param_bounds = [[0,0,-np.inf,-np.inf,
-                     0,-np.inf,0,-np.inf],
-                    [np.inf,0.1,np.inf,np.inf,
-                     0.5,np.inf,0.5,np.inf]]
+    param_bounds = [[i if i is not None else -np.inf for i,_ in bounds],
+                    [i if i is not None else np.inf for _,i in bounds]]
 
     params, covariance = curve_fit(SE_improved_func, X, P_data, p0=initial_guess, bounds=param_bounds)
     print(f"拟合参数结果: {params}")
