@@ -28,13 +28,6 @@ def log_func(x, a, b):
 def power_func(x, a, b):
     return a + np.power(x,b)
 
-# 目标函数，我们需要最小化的目标函数，例如可以是模型预测和实际数据之间的误差
-def obj_power_func(params,x,y):
-    # 计算模型预测值
-    y_pred = power_func(x, *params)
-    # 计算误差，这里使用平方误差
-    return np.sum((y - y_pred)**2)
-
 
 if __name__ == '__main__':
     # 生成一些示例数据
@@ -44,13 +37,17 @@ if __name__ == '__main__':
     beta = [2.305, 2.482, 2.576, 2.655]
 
     # 创建字典，用于映射变量名
-    value_dict = {0:'k', 1:'alpha', 2:'beta'}
+    value_dict = {0: 'k', 1: 'alpha', 2: 'beta'}
     # 创建一个细粒度的x值数组，用于绘制平滑曲线
     x_fine = np.linspace(min(x), max(x), 400)
 
+    # 设置画布大小
+    plt.figure(figsize=(16, 9))  # 宽度12英寸，高度8英寸
+
     for i, y in enumerate([k, alpha, beta]):
-        plt.subplot(1, 3, i + 1)  # 3行3列子图中的第i+1个
+        plt.subplot(2, 3, i + 1)  # 2行3列子图中的第i+1个
         plt.plot(x, y, 'o', label=f'原始数据 {value_dict[i]}')  # 原始数据点只需要绘制一次
+        plt.grid()  # 加上网格线
         print(f"参数{value_dict[i]}拟合曲线绘制开始\n-------------------------------------\n")
         for degree in range(1, 4):
             # 使用polyfit进行多项式拟合
@@ -60,13 +57,40 @@ if __name__ == '__main__':
             plt.plot(x_fine, polynomial(x_fine), label=f'{degree}次拟合曲线')  # 拟合曲线
             print(f"参数{value_dict[i]}{degree}次拟合结果的平均绝对误差MAE：{mean_squared_error(k, polynomial(x))}")
 
+        # 对数函数拟合
+        params, covariance = curve_fit(log_func, x, y)
+        print(f"系数{value_dict[i]}关于温度T的对数函数方程a+b*log(x)参数:\n", params)
+        plt.plot(x_fine, log_func(x_fine, *params), label=f'对数函数拟合曲线')  # 拟合曲线
+        print(f"参数{value_dict[i]}对数函数拟合结果的平均绝对误差MAE：{mean_squared_error(k, log_func(x, *params))}")
 
-        plt.xlabel('温度')
+        # 幂函数拟合
+        params, covariance = curve_fit(power_func, x, y)
+        print(f"系数{value_dict[i]}关于温度T的幂函数方程a+x^b参数:\n", params)
+        plt.plot(x_fine, power_func(x_fine, *params), label=f'幂函数拟合曲线')  # 拟合曲线
+        print(f"参数{value_dict[i]}幂函数拟合结果的平均绝对误差MAE：{mean_squared_error(k, power_func(x, *params))}")
+
+        # 只要第一行子图的标题
         plt.ylabel(f'{value_dict[i]}值')
         plt.title(f'{value_dict[i]}值随温度变化的拟合曲线')
         plt.legend()
+
+        # 再单独画三次多项式方程的拟合结果
+        plt.subplot(2, 3, 4+i)  # 2行3列子图中的第4+i个
+        plt.plot(x, y, 'o', label=f'原始数据 {value_dict[i]}')  # 原始数据点只需要绘制一次
+        plt.grid()  # 加上网格线
+        degree = 3
+        # 使用polyfit进行多项式拟合
+        coefficients = np.polyfit(x, y, degree)
+        polynomial = np.poly1d(coefficients)
+        plt.plot(x_fine, polynomial(x_fine), label=f'{degree}次拟合曲线')  # 拟合曲线
+
+        # 设置坐标参数
+        plt.xlabel('温度')
+        plt.ylabel(f'{value_dict[i]}值')
+        plt.legend()
+
         print(f"参数{value_dict[i]}拟合曲线绘制结束\n-------------------------------------\n")
 
-    # plt.savefig('./多段温度参数多函数拟合结果.png', dpi=500)
+    plt.savefig('./多段温度参数多函数拟合结果.png', dpi=500)
     plt.show()
 
