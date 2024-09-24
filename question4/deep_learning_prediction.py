@@ -5,17 +5,18 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+early_stop = 5
 
 # 定义读取数据的方法
 def readdata(data_path: str = '../appendix1_all.csv') -> None:
     df = pd.read_csv(data_path)
-    B_col = df.columns[4:]
+    B_col = df.columns[5:]
 
     # 算出磁通密度最大值
     df['Bm'] = df[B_col].max(axis=1)
 
     y = np.array(df['磁芯损耗'])  # , dtype=int)
-    x = df[["温度", "频率", '励磁波形', 'Bm', '材料类别', '磁芯损耗']]
+    x = df[["温度", "频率", '励磁波形', 'Bm', '材料类别']]
 
     # 定义替换规则
     onehot_mapping = {
