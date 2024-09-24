@@ -55,19 +55,19 @@ if __name__ == '__main__':
             polynomial = np.poly1d(coefficients)
             print(f"系数{value_dict[i]}关于温度T的{degree}次多项式方程:\n", polynomial)
             plt.plot(x_fine, polynomial(x_fine), label=f'{degree}次拟合曲线')  # 拟合曲线
-            print(f"参数{value_dict[i]}{degree}次拟合结果的平均绝对误差MAE：{mean_squared_error(k, polynomial(x))}")
+            print(f"参数{value_dict[i]}{degree}次拟合结果的平均绝对误差MAE：{mean_squared_error(y, polynomial(x))}")
 
         # 对数函数拟合
         params, covariance = curve_fit(log_func, x, y)
-        print(f"系数{value_dict[i]}关于温度T的对数函数方程a+b*log(x)参数:\n", params)
+        print(f"参数{value_dict[i]}关于温度T的对数函数方程a+b*log(x)参数:\n", params)
         plt.plot(x_fine, log_func(x_fine, *params), label=f'对数函数拟合曲线')  # 拟合曲线
-        print(f"参数{value_dict[i]}对数函数拟合结果的平均绝对误差MAE：{mean_squared_error(k, log_func(x, *params))}")
+        print(f"参数{value_dict[i]}对数函数拟合结果的平均绝对误差MAE：{mean_squared_error(y, log_func(x, *params))}")
 
         # 幂函数拟合
         params, covariance = curve_fit(power_func, x, y)
         print(f"系数{value_dict[i]}关于温度T的幂函数方程a+x^b参数:\n", params)
         plt.plot(x_fine, power_func(x_fine, *params), label=f'幂函数拟合曲线')  # 拟合曲线
-        print(f"参数{value_dict[i]}幂函数拟合结果的平均绝对误差MAE：{mean_squared_error(k, power_func(x, *params))}")
+        print(f"参数{value_dict[i]}幂函数拟合结果的平均绝对误差MAE：{mean_squared_error(y, power_func(x, *params))}")
 
         # 只要第一行子图的标题
         plt.ylabel(f'{value_dict[i]}值')
