@@ -332,7 +332,7 @@ def analyze_flux_density():
     # 绘制波形的统计量热图
     plt.figure(figsize=(12, 6))
     sns.heatmap(shape_stats_df, annot=True, fmt=".2f", cmap='coolwarm', linewidths=.5)
-    plt.title('波形与统计量的相关性')
+    plt.title('三类波形与时序特征的相关性矩阵')
     plt.ylabel('统计量')
     plt.xlabel('波形')
     plt.tight_layout()
@@ -361,7 +361,7 @@ def plot_combined_heatmaps(material_stats_df, shape_stats_df, temperature_stats_
 
     # 绘制波形的统计量热图
     sns.heatmap(shape_stats_df, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5, ax=axs[1])
-    axs[1].set_title('波形与磁通密度相关属性的相关性')
+    axs[1].set_title('三类波形与时序特征的相关性矩阵')
 
 
     # 绘制温度的统计量热图
@@ -376,104 +376,7 @@ def plot_combined_heatmaps(material_stats_df, shape_stats_df, temperature_stats_
     plt.show()
 
 
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error
-import matplotlib.pyplot as plt
-
-
-# 读取并处理数据
-def load_and_combine_data(file_paths):
-    combined_data = []
-    for file_path in file_paths:
-        df = pd.read_csv(file_path)
-
-        # 重命名列名以确保一致性
-        df.rename(columns={"温度，oC": "温度", "频率，Hz": "频率", "磁芯损耗，w/m3": "磁芯损耗"}, inplace=True)
-        df.rename(columns=lambda x: x.strip(), inplace=True)  # 去除列名中的空格
-
-        # 计算磁通密度的平均值
-        flux_density_columns = df.columns[4:]  # 磁通密度数据从第5列到最后一列
-        df['平均磁通密度'] = df[flux_density_columns].mean(axis=1)
-
-        # 计算偏度和峰度
-        from scipy.stats import skew, kurtosis
-        df['偏度'] = skew(df[flux_density_columns], axis=1)
-        df['峰度'] = kurtosis(df[flux_density_columns], axis=1)
-
-        # 磁通损失为第3列
-        df['磁通损失'] = df.iloc[:, 2]
-
-        # 保留需要的列
-        combined_data.append(df[['偏度', '峰度', '磁通损失']])
-
-    combined_df = pd.concat(combined_data, ignore_index=True)
-    return combined_df
-
-
-# 多项式回归训练
-def polynomial_regression(degree=2):
-    # CSV 文件路径
-    file_paths = [
-        r"../appendix1_m1.csv",
-        r"../appendix1_m2.csv",
-        r"../appendix1_m3.csv",
-        r"../appendix1_m4.csv"
-    ]
-
-    # 加载数据
-    combined_df = load_and_combine_data(file_paths)
-
-    # 特征 X（偏度和峰度） 和 目标值 y（磁通损失）
-    X = combined_df[['偏度', '峰度']].values
-    y = combined_df['磁通损失'].values
-
-    # 多项式特征扩展
-    poly = PolynomialFeatures(degree=degree)
-    X_poly = poly.fit_transform(X)
-
-    # 数据标准化
-    scaler = StandardScaler()
-    X_poly_scaled = scaler.fit_transform(X_poly)
-
-    # 训练集和测试集划分
-    X_train, X_test, y_train, y_test = train_test_split(X_poly_scaled, y, test_size=0.2, random_state=42)
-
-    # 创建线性回归模型
-    model = LinearRegression()
-
-    # 训练模型
-    model.fit(X_train, y_train)
-
-    # 预测
-    y_train_pred = model.predict(X_train)
-    y_test_pred = model.predict(X_test)
-
-    # 计算训练和测试集的绝对误差
-    train_mae = mean_absolute_error(y_train, y_train_pred)
-    test_mae = mean_absolute_error(y_test, y_test_pred)
-
-    print(f'Train MAE: {train_mae:.4f}')
-    print(f'Test MAE: {test_mae:.4f}')
-
-    # 绘制测试集预测结果与实际值的对比
-    plt.scatter(y_test, y_test_pred, color='blue', label='Predicted vs Actual')
-    plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', label='Perfect Prediction Line')
-    plt.xlabel('Actual Loss')
-    plt.ylabel('Predicted Loss')
-    plt.title('Test Set: Predicted vs Actual Magnetic Flux Loss')
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
-    # 返回模型系数
-    print(f'Model Coefficients: {model.coef_}')
-    print(f'Model Intercept: {model.intercept_}')
 
 
 if __name__ == '__main__':
-    polynomial_regression(degree=3)  # 设置多项式的次数为3
-
+   analyze_flux_density()
