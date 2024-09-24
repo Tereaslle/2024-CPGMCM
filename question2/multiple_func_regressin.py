@@ -59,6 +59,8 @@ if __name__ == '__main__':
             print(f"系数{value_dict[i]}关于温度T的{degree}次多项式方程:\n", polynomial)
             plt.plot(x_fine, polynomial(x_fine), label=f'{degree}次拟合曲线')  # 拟合曲线
             print(f"参数{value_dict[i]}{degree}次拟合结果的平均绝对误差MAE：{mean_squared_error(k, polynomial(x))}")
+
+
         plt.xlabel('温度')
         plt.ylabel(f'{value_dict[i]}值')
         plt.title(f'{value_dict[i]}值随温度变化的拟合曲线')
