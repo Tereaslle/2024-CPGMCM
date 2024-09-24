@@ -12,10 +12,10 @@ else:
 
 # Define the confusion matrices and model names
 models = [
-    ("XGBoost (波形图输入)", np.array([[1196, 2, 9], [0, 1447, 0], [1, 2, 1063]], dtype=np.float64)),
-    ("XGBoost (频谱图输入)", np.array([[1207, 0, 0], [0, 1447, 0], [0, 0, 1066]], dtype=np.float64)),
-    ("随机森林 (波形图输入)", np.array([[1198, 6, 3], [0, 1447, 0], [0, 7, 1059]], dtype=np.float64)),
-    ("随机森林 (频谱图输入)", np.array([[1207, 0, 0], [0, 1447, 0], [0, 0, 1066]], dtype=np.float64)),
+    ("XGBoost (时序特征输入)", np.array([[1196, 2, 9], [0, 1447, 0], [1, 2, 1063]], dtype=np.float64)),
+    ("XGBoost (频域特征输入)", np.array([[1207, 0, 0], [0, 1447, 0], [0, 0, 1066]], dtype=np.float64)),
+    ("随机森林 (时序特征输入)", np.array([[1198, 6, 3], [0, 1447, 0], [0, 7, 1059]], dtype=np.float64)),
+    ("随机森林 (频域特征输入)", np.array([[1207, 0, 0], [0, 1447, 0], [0, 0, 1066]], dtype=np.float64)),
 ]
 
 classes_3x3 = ['正弦波', '三角波', '梯形波']  # Class labels

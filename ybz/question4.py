@@ -8,6 +8,7 @@ import torch.optim as optim
 from scipy.stats import skew, kurtosis
 import platform
 import matplotlib
+
 # 根据操作系统自动调整字体
 current_os = platform.platform()
 if 'macOS' in current_os:
@@ -16,10 +17,10 @@ else:
     plt.rcParams['font.sans-serif'] = ['SimHei']
 
 matplotlib.rcParams['axes.unicode_minus'] = False  # 解决负号显示不了的问题
+
 # 定义读取数据的方法
 def readdata(data_path: str = '../appendix1_all.csv') -> None:
     df = pd.read_csv(data_path)
-    # df = df[df['材料类别'] == 4]
     B_col = df.columns[5:]
 
     # 计算特征
@@ -65,7 +66,7 @@ class BPNN(nn.Module):
             x = layer(x)
         return x
 
-# 定义MSE损失
+# 定义损失函数
 if __name__ == '__main__':
     # 读取数据
     x_train, x_test, y_train, y_test = readdata()
@@ -89,6 +90,8 @@ if __name__ == '__main__':
     # 训练模型
     epochs = 1000
     mse_losses = []
+    mae_losses = []
+    rmse_losses = []
 
     for epoch in range(epochs):
         model.train()
@@ -96,12 +99,19 @@ if __name__ == '__main__':
         outputs = model(x_train)
 
         mse_loss = criterion(outputs, y_train)
+        mse_losses.append(mse_loss.item())
+
+        # Calculate MAE and RMSE
+        mae_loss = torch.mean(torch.abs(outputs - y_train))
+        rmse_loss = torch.sqrt(mse_loss)
+
+        mae_losses.append(mae_loss.item())
+        rmse_losses.append(rmse_loss.item())
+
         mse_loss.backward()
         optimizer.step()
 
-        mse_losses.append(mse_loss.item())
-
-        print(f'Epoch [{epoch + 1}/{epochs}], MSE Loss: {mse_loss.item():.4f}')
+        print(f'Epoch [{epoch + 1}/{epochs}], MSE Loss: {mse_loss.item():.4f}, MAE Loss: {mae_loss.item():.4f}, RMSE Loss: {rmse_loss.item():.4f}')
 
     # 测试模型
     model.eval()
@@ -111,45 +121,15 @@ if __name__ == '__main__':
         test_loss = criterion(predictions, y_test)
         print(f'Test MSE Loss: {test_loss.item():.4f}')
 
-        # 计算平均误差
-        errors = np.abs(predictions.numpy().flatten() - y_test.numpy().flatten())  # 使用绝对值
-        x_test_np = x_test.numpy()
-
-        # 根据励磁波形计算平均误差
-        waveforms = {1: '三角波', 2: '梯形波', 4: '正弦波'}
-        errors_dict = {wave: [] for wave in waveforms.values()}
-
-        for i in range(len(errors)):
-            waveform = waveforms.get(x_test_np[i][2], '未知')
-            errors_dict[waveform].append(errors[i])
-
-        # 绘制箱形图
-        plt.figure(figsize=(10, 6))
-
-        # 创建箱线图
-        box = plt.boxplot(
-            [errors_dict['正弦波'], errors_dict['三角波'], errors_dict['梯形波']],
-            labels=['正弦波', '三角波', '梯形波'],
-            patch_artist=True
-        )
-
-        # 自定义颜色
-        colors = ['lightblue', 'lightgreen', 'lightcoral']
-        for i, patch in enumerate(box['boxes']):
-            patch.set_facecolor(colors[i])
-            patch.set_edgecolor('black')
-            patch.set_linewidth(1)
-
-        # 设置标题和标签
-        plt.title('波形平均误差分布', fontsize=16)
-        plt.ylabel('绝对误差', fontsize=14)
-        plt.xlabel('波形类型', fontsize=14)
-
-        # 美化图形
-        plt.grid(axis='y')
-        plt.xticks(fontsize=12)
-        plt.yticks(fontsize=12)
-
-        plt.savefig('平均误差箱形图.png',dpi=300)
-        plt.show()
-
+    # 绘制损失图像
+    plt.figure(figsize=(12, 6))
+    plt.plot(mse_losses, label='MSE Loss', color='blue')
+    plt.plot(mae_losses, label='MAE Loss', color='orange')
+    plt.plot(rmse_losses, label='RMSE Loss', color='green')
+    plt.title('损失函数图像', fontsize=16)
+    plt.xlabel('迭代次数', fontsize=14)
+    plt.ylabel('损失', fontsize=14)
+    plt.legend()
+    plt.grid()
+    plt.savefig('损失函数图像.png', dpi=300)
+    plt.show()
