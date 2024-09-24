@@ -118,32 +118,32 @@ if __name__ == '__main__':
         '斯坦麦茨方程': [e / (10 ** norm_len[i]) for i, e in enumerate(error_metrics_origin)],
         '修正后的斯坦麦茨方程': [e / (10 ** norm_len[i]) for i, e in enumerate(error_metrics_new)]
     })
-    # 可视化：分组直方图
-    df_norm.set_index('Metric').plot(kind='bar', figsize=(10, 6))
-    plt.title('修正前后的误差指标对比直方图', fontsize=20)
-    plt.ylabel('Score', fontsize=20)
-    plt.xticks(rotation=0)
-    plt.savefig(f'./修正前后的误差指标对比直方图.png', dpi=500)
-    plt.show()
-
-    # 画散点图
-    fig, ax = plt.subplots(figsize=(17, 10))
-    x = range(len(y_true))
-    colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
-    ax.scatter(y_true, y_pred_origin, color='#40A0FF', s=8, label="原方程")
-    ax.scatter(y_true, y_pred_new, color='#99FF33', s=8, label="修正后的方程")
-    ax.plot(y_true, y_true,  color='red', linewidth=2, label="真实值参考线")
-    # loc='best'：这个参数指定图例的最佳位置
-    # fontsize=12 指定图例大小
-    # frameon=False：这个参数决定是否在图例周围绘制一个边框
-    # ncol=1：这个参数指定图例中的条目应该被排列成多少列
-    plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
-    # 设置图表标题和轴标签
-    plt.title('修正前后预测分布散点图')
-    plt.xlabel('真实损耗')
-    plt.ylabel('预测损耗')
-    plt.savefig(f'./修正前后预测分布散点图.png', dpi=400)
-    plt.show()
+    # # 可视化：分组直方图
+    # df_norm.set_index('Metric').plot(kind='bar', figsize=(10, 6))
+    # plt.title('修正前后的误差指标对比直方图', fontsize=20)
+    # plt.ylabel('误差值', fontsize=20)
+    # plt.xlabel('误差指标', fontsize=20)
+    # plt.xticks(rotation=0)
+    # plt.savefig(f'./修正前后的误差指标对比直方图.png', dpi=500)
+    # plt.show()
+    #
+    # # 画散点图
+    # fig, ax = plt.subplots(figsize=(17, 10))
+    # x = range(len(y_true))
+    # ax.scatter(y_true, y_pred_origin, color='#0066CC', s=12, label="原方程拟合点")
+    # ax.scatter(y_true, y_pred_new, color='#00CC00', s=12, label="修正后的方程拟合点")
+    # ax.plot(y_true, y_true,  color='red', linewidth=2, label="真实值参考线")
+    # # loc='best'：这个参数指定图例的最佳位置
+    # # fontsize=12 指定图例大小
+    # # frameon=False：这个参数决定是否在图例周围绘制一个边框
+    # # ncol=1：这个参数指定图例中的条目应该被排列成多少列
+    # plt.legend(loc='best', fontsize=18, frameon=False, ncol=1)
+    # # 设置图表标题和轴标签
+    # plt.title('修正前后拟合分布散点图', fontsize=18)
+    # plt.xlabel('真实损耗', fontsize=18)
+    # plt.ylabel('预测损耗', fontsize=18)
+    # plt.savefig(f'./修正前后预测分布散点图.png', dpi=400)
+    # plt.show()
 
     # # --------------------------多段温度分析------------------------
     # temp_index = [filtered_df[filtered_df['温度'] == 25].index,
@@ -172,22 +172,23 @@ if __name__ == '__main__':
     # plt.show()
 
     # 画不同温度下预测结果的散点图
-    # fig, ax = plt.subplots(figsize=(17, 10))
-    # x = range(len(y_true))
-    # colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
-    # for i, t in enumerate([25,50,70,90]):
-    #     # 筛选出不同温度的预测效果
-    #     temp = filtered_df[filtered_df['温度'] == t]
-    #     y_pred_model1_temp = temp['斯坦麦茨方程'].values
-    #     y_true_temp = temp['磁芯损耗'].values
-    #     ax.scatter(y_true_temp, y_pred_model1_temp, color=colors[i], s=8, label=f"温度{t}")
-    # # ax.scatter(y_true, y_pred_model1, color='#40A0FF', s=8)
-    # ax.plot(y_true, y_true,  color='red', linewidth=2)
-    # plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
-    # # 设置图表标题和轴标签
-    # plt.title('材料一斯坦麦茨方程预测分布')
-    # plt.xlabel('真实损耗')
-    # plt.ylabel('预测损耗')
-    # plt.savefig(f'./不同温度下斯坦麦茨方程预测分布.png', dpi=400)
-    # plt.show()
+    fig, ax = plt.subplots(figsize=(17, 10))
+    x = range(len(y_true))
+    colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
+    for i, t in enumerate([25,50,70,90]):
+        # 筛选出不同温度的预测效果
+        temp = filtered_df[filtered_df['温度'] == t]
+        y_pred_model1_temp = temp['斯坦麦茨方程'].values
+        y_true_temp = temp['磁芯损耗'].values
+        ax.scatter(y_true_temp, y_pred_model1_temp, color=colors[i], s=8, label=f"温度{t}拟合点")
+    # ax.scatter(y_true, y_pred_model1, color='#40A0FF', s=8)
+    ax.plot(y_true, y_true,  color='red', linewidth=2)
+    plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
+    # 设置图表标题和轴标签
+    plt.title('材料一不同温度下斯坦麦茨方程拟合分布散点图', fontsize=18)
+    plt.xlabel('真实损耗', fontsize=18)
+    plt.ylabel('预测损耗', fontsize=18)
+    plt.legend(loc='best', fontsize=18, frameon=False, ncol=1)
+    plt.savefig(f'./不同温度下斯坦麦茨方程拟合分布散点图.png', dpi=400)
+    plt.show()
 
