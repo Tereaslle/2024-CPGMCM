@@ -62,7 +62,7 @@ if __name__ == '__main__':
                        "0（磁通密度，T）": "0"}, inplace=True)
     # 定义波形筛选条件
     # shape_condition = df['励磁波形'] == '正弦波'
-    # data = df[shape_condition]
+    # filtered_df = df[shape_condition]
     data = df
     # 选择所有磁通密度的列名
     col = data.columns[4:]
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     ax.scatter(x, y_true, color='#FF6347', s=8, label='真实磁芯损耗')
     ax.scatter(x, y_pred_model1, color='#40A0FF', s=8, label='原斯坦麦茨方程预测')
     ax.scatter(x, y_pred_model2, color='#66CDAA', s=8, label='修正斯坦麦茨方程预测')
-    # Erase 上面 the data by filling with white
+    # Erase 上面 the filtered_df by filling with white
     # ax.fill_between(x, y_true, max(y_true), color='white')
     # 设置图例列宽：columnspacing=float (upper left)
     plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)

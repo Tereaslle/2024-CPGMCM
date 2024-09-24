@@ -5,7 +5,6 @@ import matplotlib.colors as mcolors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import matplotlib
-from datetime import datetime, timedelta
 import pandas as pd
 import warnings
 import seaborn as sns
@@ -63,16 +62,16 @@ if __name__ == '__main__':
                        "0（磁通密度，T）": "0"}, inplace=True)
     # 定义波形筛选条件
     shape_condition = df['励磁波形'] == '正弦波'
-    data = df[shape_condition]
-    # data = df
+    filtered_df = df[shape_condition]
+    # filtered_df = df
     # 选择所有磁通密度的列名
-    col = data.columns[4:]
+    col = filtered_df.columns[4:]
 
     # 假设我们有一些已测量的数据
-    f_data = data['频率'].values
-    Bm_data = data[col].max(axis=1)
-    T_data = data['温度'].values
-    P_data = data['磁芯损耗'].values
+    f_data = filtered_df['频率'].values
+    Bm_data = filtered_df[col].max(axis=1)
+    T_data = filtered_df['温度'].values
+    P_data = filtered_df['磁芯损耗'].values
 
     # 初始猜测的参数值
     initial_guess = [5, 1.6, 2.7]
@@ -89,46 +88,96 @@ if __name__ == '__main__':
     print(f"k1: {k1_ste_opt}, alpha1: {alpha1_ste_opt}, beta1: {beta1_ste_opt}")
     print("优化后的目标函数:", result.fun / 1e12)
 
-    data['斯坦麦茨方程'] = [curve_fit_SE(f, Bm) for f, Bm in zip(f_data, Bm_data)]
-        # [steinmetz_eq([k1_ste_opt, alpha1_ste_opt, beta1_ste_opt], f, Bm) for f, Bm in zip(f_data, Bm_data)]
-    data['不同温度斯坦麦茨方程'] = [temp_SE(f, Bm, T) for f, Bm, T in
-                      zip(f_data, Bm_data, T_data)]
+    filtered_df['斯坦麦茨方程'] = [steinmetz_eq([k1_ste_opt, alpha1_ste_opt, beta1_ste_opt], f, Bm) for f, Bm in zip(f_data, Bm_data)]
+    filtered_df['多段温度修正的斯坦麦茨方程'] = [temp_SE(f, Bm, T) for f, Bm, T in zip(f_data, Bm_data, T_data)]
 
-    y_true = data['磁芯损耗'].values
-    y_pred_model1 = data['斯坦麦茨方程'].values
-    y_pred_model2 = data['不同温度斯坦麦茨方程'].values
+    y_true = filtered_df['磁芯损耗'].values
+    y_pred_origin = filtered_df['斯坦麦茨方程'].values
+    y_pred_new = filtered_df['多段温度修正的斯坦麦茨方程'].values
 
-    temp_index = [data[data['温度'] == 25].index,
-                  data[data['温度'] == 50].index,
-                  data[data['温度'] == 70].index,
-                  data[data['温度'] == 90].index]
-
-    # 计算模型1和模型2的评价指标
-    metrics_model1 = evaluate_temp_mae(y_true, y_pred_model1, temp_index)
-    metrics_model2 = evaluate_temp_mae(y_true, y_pred_model2, temp_index)
+    # 计算原方程和修正方程的总体误差评价指标
+    error_metrics_origin = evaluate_model(y_true, y_pred_origin)
+    error_metrics_new = evaluate_model(y_true, y_pred_new)
 
     # 创建DataFrame保存结果
     df = pd.DataFrame({
-        '温度': ['25', '50', '70', '90'],
-        '斯坦麦茨方程': metrics_model1,
-        '修正后斯坦麦茨方程': metrics_model2
+        'Metric': ['MSE', 'RMSE', 'MAE', 'R2'],
+        '斯坦麦茨方程': error_metrics_origin,
+        '修正后的斯坦麦茨方程': error_metrics_new
     })
 
-    colors = ['#40A0FF', '#99FF33', '#7A40FF', '#FF3399']
+    # df.to_excel('问题2\\对比结果.xlsx')
+
+    norm_len = []
+    for i in range(len(error_metrics_origin)):
+        norm_len.append(min(len(str(int(error_metrics_origin[i]))), len(str(int(error_metrics_new[i])))))
+    # min(len(str(int(i))) for i in error_metrics_origin)
+
+    df_norm = pd.DataFrame({
+        'Metric': ['MSE', 'RMSE', 'MAE', 'R2'],
+        '斯坦麦茨方程': [e / (10 ** norm_len[i]) for i, e in enumerate(error_metrics_origin)],
+        '修正后的斯坦麦茨方程': [e / (10 ** norm_len[i]) for i, e in enumerate(error_metrics_new)]
+    })
     # 可视化：分组直方图
-    df.set_index('温度').plot(kind='bar', figsize=(10, 6), color=colors)
-    plt.title('使用多段温度修正前后的效果对比', fontsize=12)
-    plt.ylabel('MAE误差值', fontsize=12)
+    df_norm.set_index('Metric').plot(kind='bar', figsize=(10, 6))
+    plt.title('修正前后的误差指标对比直方图', fontsize=20)
+    plt.ylabel('Score', fontsize=20)
     plt.xticks(rotation=0)
-    plt.savefig(f'./使用多段温度修正前后的效果对比.png', dpi=500)
+    plt.savefig(f'./修正前后的误差指标对比直方图.png', dpi=500)
     plt.show()
 
+    # 画散点图
+    fig, ax = plt.subplots(figsize=(17, 10))
+    x = range(len(y_true))
+    colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
+    ax.scatter(y_true, y_pred_origin, color='#40A0FF', s=8, label="原方程")
+    ax.scatter(y_true, y_pred_new, color='#99FF33', s=8, label="修正后的方程")
+    ax.plot(y_true, y_true,  color='red', linewidth=2, label="真实值参考线")
+    # loc='best'：这个参数指定图例的最佳位置
+    # fontsize=12 指定图例大小
+    # frameon=False：这个参数决定是否在图例周围绘制一个边框
+    # ncol=1：这个参数指定图例中的条目应该被排列成多少列
+    plt.legend(loc='best', fontsize=12, frameon=False, ncol=1)
+    # 设置图表标题和轴标签
+    plt.title('修正前后预测分布散点图')
+    plt.xlabel('真实损耗')
+    plt.ylabel('预测损耗')
+    plt.savefig(f'./修正前后预测分布散点图.png', dpi=400)
+    plt.show()
+
+    # # --------------------------多段温度分析------------------------
+    # temp_index = [filtered_df[filtered_df['温度'] == 25].index,
+    #               filtered_df[filtered_df['温度'] == 50].index,
+    #               filtered_df[filtered_df['温度'] == 70].index,
+    #               filtered_df[filtered_df['温度'] == 90].index]
+    #
+    # # 计算原方程和修正方程的多段温度平均绝对误差评价指标
+    # different_temp_error_metrics_origin = evaluate_temp_mae(y_true, y_pred_origin, temp_index)
+    # different_temp_error_metrics_new = evaluate_temp_mae(y_true, y_pred_new, temp_index)
+    #
+    # # 创建DataFrame保存结果
+    # df = pd.DataFrame({
+    #     '温度': ['25', '50', '70', '90'],
+    #     '斯坦麦茨方程': different_temp_error_metrics_origin,
+    #     '修正后斯坦麦茨方程': different_temp_error_metrics_new
+    # })
+    #
+    # colors = ['#40A0FF', '#99FF33', '#7A40FF', '#FF3399']
+    # # 可视化：分组直方图
+    # df.set_index('温度').plot(kind='bar', figsize=(10, 6), color=colors)
+    # plt.title('使用多段温度修正前后的效果对比', fontsize=12)
+    # plt.ylabel('MAE误差值', fontsize=12)
+    # plt.xticks(rotation=0)
+    # plt.savefig(f'./使用多段温度修正前后的效果对比.png', dpi=500)
+    # plt.show()
+
+    # 画不同温度下预测结果的散点图
     # fig, ax = plt.subplots(figsize=(17, 10))
     # x = range(len(y_true))
     # colors = ['#40A0FF', '#99FF33','#7A40FF','#FF3399']
     # for i, t in enumerate([25,50,70,90]):
     #     # 筛选出不同温度的预测效果
-    #     temp = data[data['温度'] == t]
+    #     temp = filtered_df[filtered_df['温度'] == t]
     #     y_pred_model1_temp = temp['斯坦麦茨方程'].values
     #     y_true_temp = temp['磁芯损耗'].values
     #     ax.scatter(y_true_temp, y_pred_model1_temp, color=colors[i], s=8, label=f"温度{t}")

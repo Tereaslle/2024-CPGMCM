@@ -2,7 +2,7 @@
 #
 # Hi There!
 #
-# You may be wondering what this giant blob of binary data here is, you might
+# You may be wondering what this giant blob of binary filtered_df here is, you might
 # even be worried that we're up to something nefarious (good for you for being
 # paranoid!). This is a base85 encoding of a zip file, this zip file contains
 # an entire copy of pip (version 24.2).
