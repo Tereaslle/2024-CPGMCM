@@ -36,35 +36,35 @@ def obj_power_func(params,x,y):
     return np.sum((y - y_pred)**2)
 
 
-# if __name__ == '__main__':
-#     # 生成一些示例数据
-#     x = [25, 50, 70, 90]
-#     k = [3.99479398, 0.74065738, 0.23393301, 0.22204269]
-#     alpha = [1.347, 1.492, 1.591, 1.602]
-#     beta = [2.305, 2.482, 2.576, 2.655]
-#
-#     # 创建字典，用于映射变量名
-#     value_dict = {0:'k', 1:'alpha', 2:'beta'}
-#     # 创建一个细粒度的x值数组，用于绘制平滑曲线
-#     x_fine = np.linspace(min(x), max(x), 400)
-#
-#     for i, y in enumerate([k, alpha, beta]):
-#         plt.subplot(1, 3, i + 1)  # 3行3列子图中的第i+1个
-#         plt.plot(x, y, 'o', label=f'原始数据 {value_dict[i]}')  # 原始数据点只需要绘制一次
-#         print(f"参数{value_dict[i]}拟合曲线绘制开始\n-------------------------------------\n")
-#         for degree in range(1, 4):
-#             # 使用polyfit进行多项式拟合
-#             coefficients = np.polyfit(x, y, degree)
-#             polynomial = np.poly1d(coefficients)
-#             print(f"系数{value_dict[i]}关于温度T的{degree}次多项式方程:\n", polynomial)
-#             plt.plot(x_fine, polynomial(x_fine), label=f'{degree}次拟合曲线')  # 拟合曲线
-#             print(f"参数{value_dict[i]}{degree}次拟合结果的平均绝对误差MAE：{mean_squared_error(k, polynomial(x))}")
-#         plt.xlabel('温度')
-#         plt.ylabel(f'{value_dict[i]}值')
-#         plt.title(f'{value_dict[i]}值随温度变化的拟合曲线')
-#         plt.legend()
-#         print(f"参数{value_dict[i]}拟合曲线绘制结束\n-------------------------------------\n")
-#
-#     # plt.savefig('./多段温度参数多函数拟合结果.png', dpi=500)
-#     plt.show()
+if __name__ == '__main__':
+    # 生成一些示例数据
+    x = [25, 50, 70, 90]
+    k = [3.99479398, 0.74065738, 0.23393301, 0.22204269]
+    alpha = [1.347, 1.492, 1.591, 1.602]
+    beta = [2.305, 2.482, 2.576, 2.655]
+
+    # 创建字典，用于映射变量名
+    value_dict = {0:'k', 1:'alpha', 2:'beta'}
+    # 创建一个细粒度的x值数组，用于绘制平滑曲线
+    x_fine = np.linspace(min(x), max(x), 400)
+
+    for i, y in enumerate([k, alpha, beta]):
+        plt.subplot(1, 3, i + 1)  # 3行3列子图中的第i+1个
+        plt.plot(x, y, 'o', label=f'原始数据 {value_dict[i]}')  # 原始数据点只需要绘制一次
+        print(f"参数{value_dict[i]}拟合曲线绘制开始\n-------------------------------------\n")
+        for degree in range(1, 4):
+            # 使用polyfit进行多项式拟合
+            coefficients = np.polyfit(x, y, degree)
+            polynomial = np.poly1d(coefficients)
+            print(f"系数{value_dict[i]}关于温度T的{degree}次多项式方程:\n", polynomial)
+            plt.plot(x_fine, polynomial(x_fine), label=f'{degree}次拟合曲线')  # 拟合曲线
+            print(f"参数{value_dict[i]}{degree}次拟合结果的平均绝对误差MAE：{mean_squared_error(k, polynomial(x))}")
+        plt.xlabel('温度')
+        plt.ylabel(f'{value_dict[i]}值')
+        plt.title(f'{value_dict[i]}值随温度变化的拟合曲线')
+        plt.legend()
+        print(f"参数{value_dict[i]}拟合曲线绘制结束\n-------------------------------------\n")
+
+    # plt.savefig('./多段温度参数多函数拟合结果.png', dpi=500)
+    plt.show()
 
