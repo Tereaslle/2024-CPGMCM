@@ -7,3 +7,4 @@ node_modules
 appendix1_all.csv
 predicted_waveform_with_mapping.xlsx
 test.py
+report.log
