@@ -128,7 +128,7 @@ if __name__ == '__main__':
     fig, ax = plt.subplots(figsize=(10, 7))
     x = range(len(y_true))
     ax.scatter(x, y_true, color='#FF6347', s=8, label='真实磁芯损耗')
-    ax.scatter(x, y_pred_model1, color='#40A0FF', s=8, label='原斯坦麦茨方程预测')
+    ax.scatter(x, y_pred_model1, color='#40A0FF', s=8, label                                                                    ='原斯坦麦茨方程预测')
     ax.scatter(x, y_pred_model2, color='#66CDAA', s=8, label='修正斯坦麦茨方程预测')
     # Erase 上面 the filtered_df by filling with white
     # ax.fill_between(x, y_true, max(y_true), color='white')

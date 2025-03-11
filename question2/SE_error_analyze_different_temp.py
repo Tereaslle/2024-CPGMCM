@@ -191,4 +191,3 @@ if __name__ == '__main__':
     plt.legend(loc='best', fontsize=18, frameon=False, ncol=1)
     plt.savefig(f'./不同温度下斯坦麦茨方程拟合分布散点图.png', dpi=400)
     plt.show()
-

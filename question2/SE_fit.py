@@ -63,7 +63,7 @@ if __name__ == '__main__':
     P = filtered_df['磁芯损耗'].to_numpy()
 
     # 拟合模型，p0是给参数初始值
-    # 设定k, alpha和beta的下界和上界,防止运算溢出。其中k为负无穷到正无穷，alpha为1到3, beta为2到3
+    # 设定k, alpha和beta的下界和上界,防止运算溢出。其中k为负无穷到正无穷，alpha 为 1 到 3, beta 为 2 到 3
     param_bounds = ([-np.inf, 1, 2], [np.inf, 3, 3])
     params, covariance = curve_fit(SE_func, X, P, p0=[1, 1, 2], bounds=param_bounds)
     print(f"拟合参数结果: {params}")
